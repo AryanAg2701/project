@@ -1,20 +1,38 @@
 import axios from "axios";
 import React,{useState} from "react";
+import { useParams } from "react-router-dom";
+import movies from "./app.jsx"
  
 function Movie1 () {
     const [username,setname]=useState("")
     const [rev,setreview]=useState("")
     const [rating,setrating]=useState()
     const [reply, setReply] = useState("")
-    const [reviewarr,setarr]=useState([{
-        username:"kapil",
-        rating:4,
-        rev:"Good Movie!!",
-    }])
+    const [reviewarr,setarr]=useState([])
+    
+    const {id}=useParams();
+
+    const movie=movies.find(movie=>(movie.id)===id)
+    
+    const fetchreviews = () => {
+      axios
+        .get(`http://localhost:3000/api/movie/${id}/review`)
+        .then((response) => {
+          setarr(response.data);
+        })
+        .catch((error) => {
+          setReply("Error fetching bookings");
+        });
+    };
+  
+    useEffect(() => {
+      fetchreviews();
+    }, []);
+  
     const submit = () => {
         const revdetails = { username, rating, rev };
         axios
-          .post("http://localhost:3000/api/review1", revdetails)
+          .post(`http://localhost:3000/api/movie/${id}/review`, revdetails)
           .then((response) => {
             setReply(response.data.message);
             setname("");
@@ -25,9 +43,9 @@ function Movie1 () {
             setReply("Error posting review");
           });
       };
-      const editrev=(id)=>{
+      const editrev=(uid)=>{
         axios
-        .put(`http://localhost:3000/api/review1/${id}`)
+        .put(`http://localhost:3000/api/movie/${id}/review/${uid}`)
         
         .then((reponse)=>{
             setReply(reponse.data.message)
@@ -41,9 +59,9 @@ function Movie1 () {
         setrev("");
         setrating();
       }
-      const delrev=(id)=>{
+      const delrev=( uid)=>{
         axios
-          .delete(`http://localhost:3000/api/review1/${id}`)
+          .delete(`http://localhost:3000/api/movie/${id}/review/${uid}`)
           .then((reponse)=>{
             setReply(reponse.data.message)
           })
@@ -54,12 +72,15 @@ function Movie1 () {
     return (
        <>
        <div>
+        <div>
+          {movie.name}--{movie.genre}--{movie.duration}
+        </div>
         <ul>{reviewarr.map((review)=>(
-        <li key={review.id}>{review.username}:{review.rating} -- {review.rev}
-        <button onClick={()=>delrev(review.id)}>Delete</button><button onClick={()=>editrev(review.id)}>Edit</button>
+        <li key={review.uid}>{review.username}:{review.rating} -- {review.rev}
+        <button onClick={()=>delrev(review.uid)}>Delete</button><button onClick={()=>editrev(review.uid)}>Edit</button>
         </li>
         ))}
-        <div id="edit">
+        <div uid="edit">
         <input type ="text" value={rev} onChange={(e) => setreview(e.target.value)}/>
         <button onClick={submit}>Submit</button>
         </div>
