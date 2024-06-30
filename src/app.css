@@ -1,0 +1,17 @@
+#list{
+    display: flex;
+    height: 500px;
+    width: 300px;
+    background-color: rgb(208, 208, 208);
+    color: black;
+    border-radius: 50px;
+
+}
+#list:hover{
+    background-color: rgb(154, 154, 154);
+    transition: all;
+    height: 550px;
+    width: 330px;
+    transition-duration: 500ms;
+
+}
